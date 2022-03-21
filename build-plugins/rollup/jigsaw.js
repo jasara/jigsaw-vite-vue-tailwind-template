@@ -10,11 +10,15 @@ export default function jigsaw() {
         process.exit(1);
     });
 
-    const jigsaw = (env) => exec(`${bin} build -q ${env}`, (error, stdout, stderr) => {
-        console.log('Building Jigsaw');
+    const jigsaw = (env) => {
+        console.log('Starting Jigsaw Build');
 
-        error ? console.warn(`Error building Jigsaw site:\n${stderr}`) : console.log(stdout);
-    });
+        exec(`${bin} build -q ${env}`, (error, stdout, stderr) => {
+            console.log('Completed Jigsaw Build');
+
+            error ? console.warn(`Error building Jigsaw site:\n${stderr}`) : console.log(stdout);
+        });
+    };
 
     return {
         name: 'build-jigsaw',
@@ -23,6 +27,12 @@ export default function jigsaw() {
         },
         async handleHotUpdate({ file }) {
             if (file.includes('build_')) {
+                return;
+            }
+            if (file.includes('_tmp')) {
+                return;
+            }
+            if (file.includes('/cache/')) {
                 return;
             }
 
